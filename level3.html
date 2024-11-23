@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection</title>
+    <link rel="stylesheet" href="styles3.css">
+</head>
+<body>
+
+    <header>
+        <h1>SQL INJECTION</h1>
+    </header>
+    <main>
+        <section class="content-box">
+            <h2>What is SQL Injection?</h2>
+            <p>
+                SQL injection is a type of web security vulnerability or commonly known as a code injection technique used primarily by hackers that might destroy your database. Attackers have access to view and manipulate sensitive data that they should not otherwise have access to.
+            </p>
+            <p>SQL injection attacks can cause unauthorized access, theft of data, and in severe cases, full system takeover, which is not favourable for the user.</p><br>
+
+            <h3>How Does SQL Injection Work?</h3>
+            <p>
+              
+                SQL injection attacks usually follow through by exploiting vulnerabilities in the application's input validation process. An example can include an attackers malicious input in the form of a web or URL parameter. Here’s an 
+                example of a vulnerable SQL query in a login system that a user may not catch initially: 
+            </p>
+
+            <div class="code-block">
+                <code>
+
+
+//vulnerable SQL query
+<br>
+const username = req.body.username;<br>
+const password = req.body.password;<br>
+const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+//if the input is not properly sanitized, the following input could bypass authentication:
+username: 'admin' -- 
+password: ''  //this comment trick removes the password check
+                </code>
+            </div>
+
+            <p>This code will allow the attacker to enter a malicious input, bypassing authentication by commenting out the password check as shown above.</p><br>
+
+            <h3>Safe SQL Query Using Parameterized Statements</h3>
+            <p>
+                One way to prevent SQL injection is by using parameterized statements or prepared queries. Here’s an 
+                example of a safer version of the same query above, only using parameterized input this time:
+            </p>
+
+            <div class="code-block">
+                <pre>
+
+//secure SQL query using parameters
+const username = req.body.username;
+const password = req.body.password;
+const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+db.query(query, [username, password], (err, result) => {if (err) throw err;
+});
+/User inputs are passed as seperate parameters and are properly escaped
+                </pre>
+            </div>
+
+            <p>
+                This approach ensures that user input is treated as data, not as part of the SQL command, preventing 
+                malicious inputs from being executed on your database without you knowing. Always practice safety in any workspace to ensure the safety and privacy of yourself and others!
+            </p>
+          
+        </section>       
+    </main>
+    
+</body>
+</html>
