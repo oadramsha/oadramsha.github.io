@@ -1,1 +1,59 @@
+name: Manual Workflow
 
+on:
+  workflow_dispatch:
+    inputs:
+      version_number:
+        description: 'Version number for this release'
+        required: true
+      description:
+        description: 'Describe the changes in this workflow'
+        required: true
+
+jobs:
+  run-steps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Print inputs
+        run: echo Inputs are ${{ inputs.version_number }} ${{ inputs.description }}
+        
+      - name: Minify Images
+        uses: calibre/image-actions@v1
+        with:
+          quality: '[80, 85]'
+          strip: true
+          verbose: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install html-minifier uglify-js clean-css-cli -g
+
+      - name: Minify HTML
+        run: html-minifier --input-dir ./path-to-html --output-dir ./path-to-minified-html --file-ext html --collapse-whitespace --remove-comments --minify-css true --minify-js true
+
+      - name: Minify CSS
+        run: cleancss -o ./path-to-minified-css ./path-to-css/*.css
+
+      - name: Minify JS
+        run: uglifyjs ./path-to-js/*.js -o ./path-to-minified-js
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ inputs.version_number }}
+          release_name: Release ${{ inputs.version_number }}
+          body: |
+            Release description:
+            ${{ inputs.description }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
